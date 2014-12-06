@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<title>Prism Lite Demo (without lookbehind support)</title>
+
+	<style type="text/css">
+	
+		pre {
+		    font-family: Consolas, Monaco, 'Andale Mono', monospace;*
+		    line-height: 1.5;
+		    color: black;
+		}
+	
+		.token.punctuation {
+		    color: #999;
+		}
+	
+		.token.string {
+		    color: #690;
+		}
+	
+		.token.keyword {
+		    color: #07a;
+		}
+	
+	</style>
+
+
+</head>
+<body>
+
+<pre><code class="language-javalite">
+public class HelloWorld {
+
+    public static void main(String[] args) {
+        String test = "Hello World!";
+        System.out.println(test);
+    }
+}
+</code></pre>
+
+
+<script>
+
+var Prism = (function() {
+
+    var self = {
+
+        languages : {},
+
+        highlightAll : function() {
+            var elements = document.querySelectorAll('code[class*="language-"]');
+
+            for (var i = 0, element; element = elements[i++];) {
+                self.highlightElement(element);
+            }
+        },
+
+        highlightElement : function(element) {
+            var language = element.className.match(/\blanguage-(?!\*)(\w+)\b/i)[1];
+            var grammar = self.languages[language];
+
+            // Set language on the parent, for styling
+            var parent = element.parentNode;
+            if (/pre/i.test(parent.nodeName)) {
+                parent.className = parent.className + ' language-' + language;
+            }
+
+            var code = element.textContent;
+
+            element.innerHTML = self.highlight(code, grammar, language);
+        },
+
+        highlight : function(text, grammar, language) {
+            var tokens = self.tokenize(text, grammar);
+            return self.Token.stringify(tokens, language);
+        },
+
+        tokenize : function(text, grammar) {
+            var strarr = [ text ];
+
+            tokenloop: for ( var token in grammar) {
+                if (!grammar.hasOwnProperty(token) || !grammar[token]) {
+                    continue;
+                }
+
+                var pattern = grammar[token];
+
+                for (var i = 0; i < strarr.length; i++) { // Don’t cache length as it changes during the loop
+
+                    var str = strarr[i];
+
+                    if (str instanceof self.Token) {
+                        continue;
+                    }
+
+                    var match = pattern.exec(str);
+
+                    if (match) {
+                        var from = match.index - 1, 
+                            match = match[0], 
+                            len = match.length, 
+                            to = from + len, 
+                            before = str.slice(0, from + 1), 
+                            after = str.slice(to + 1);
+
+                        var args = [ i, 1 ];
+
+                        if (before) {
+                            args.push(before);
+                        }
+
+                        var wrapped = new self.Token(token, match);
+
+                        args.push(wrapped);
+
+                        if (after) {
+                            args.push(after);
+                        }
+
+                        Array.prototype.splice.apply(strarr, args);
+                    }
+                }
+            }
+
+            return strarr;
+        },
+        
+        Token: function(type, content) {
+            this.type = type;
+            this.content = content;
+            
+            self.Token.stringify = function(o, language, parent) {
+                if (typeof o == 'string') {
+                    return o;
+                }
+
+                if (Array.isArray(o)) {
+                    return o.map(function(element) {
+                        return self.Token.stringify(element, language, o);
+                    }).join('');
+                }
+
+                var content = self.Token.stringify(o.content, language, parent);
+                var classes = [ 'token', o.type ];
+
+                return '<span class="' + classes.join(' ') + '">' + content + '</span>';
+            };
+        }
+    };
+    
+    return self;
+
+})();
+
+document.addEventListener('DOMContentLoaded', Prism.highlightAll);
+
+
+Prism.languages.javalite = {
+    'keyword': /\b(public|static|class|void)\b/g,
+    'string': /("|')(\\?.)*?\1/g,
+    'punctuation': /[{}[\];(),.:]/g
+};
+
+</script>
+
+</body>
+</html>

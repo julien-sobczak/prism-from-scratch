@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<title>Prism Lite Demo (with lookbehind support)</title>
+
+	<link rel="stylesheet" href="prism.css" />
+
+</head>
+<body>
+
+
+    <pre><code class="language-java">package com.prismjs;
+
+import java.io.*;
+
+@SuppressWarnings("unchecked")
+public class PrismJS {
+
+    public static Integer test = 0;
+
+    /**
+     * Javadoc style comment
+     *
+     * @param args
+     */
+    public static void main(String[] args) {
+        // Let's create some variables
+        int numArgs = args.length;
+        Integer a = 0x1;
+        String test = "" + "Hello" + " \"World\"!";
+        double dvalue = 1.23;
+        int optest = 0;
+        optest += 321 - 45 * 1247 / 425 % 123;
+
+        /*
+         * Multiline comment
+         */
+        for (int i = 0; i < numArgs; i++) {
+            // Simple line comment
+            System.out.println("Arg value= " + args[i]);
+        }
+
+        do {
+            System.out.println("Do while ok!");
+        } while (false);
+    }
+}</code></pre>
+
+<script src="prism.lite.js"></script>
+
+</body>
+</html>
